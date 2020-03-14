@@ -145,7 +145,7 @@ class SendMessage(Task):
         message_body = f"""
 Hi, it's your student loan bot!🤖
 
-Your current loan balance is *${formatted_current}*, {down_or_up} last month.
+Your current loan balance is ${formatted_current}, {down_or_up} last month.
 
 Here's which loans you should pay this month:
 
@@ -163,10 +163,10 @@ Here's which loans you should pay this month:
                     else ""
                 )
                 formatted_amount = self.fv(amount)
-                message_body += f"\n    { load_id }: _${ formatted_amount }_"
+                message_body += f"\n    { load_id }: ${ formatted_amount }"
 
         message_body += (
-            "\n\nDon't forget to update the spreadsheet, and have a _GREAT_ month!"
+            "\n\nDon't forget to update the spreadsheet, and have a GREAT month!"
         )
 
         client = Client(account_id.get(), auth_token.get())
