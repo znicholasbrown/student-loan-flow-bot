@@ -323,21 +323,15 @@ with Flow(name="Loan Payoff Reminder", schedule=schedule) as flow:
         total=current_total,
     )
 
-    # SendMessage()(
-    #     account_id=twilio_account_id,
-    #     auth_token=twilio_auth_token,
-    #     twilio_number=twilio_number,
-    #     phone_number=phone_number,
-    #     payments=payment_list,
-    #     current_total=current_total,
-    #     last_month_total=last_month_total,
-    # )
-
-    # LogResult()(get_sheet)
-    # LogResult()(row_dict)
-    # LogResult()(calc_total_after_min_payments)
-    # LogResult()(payments)
-
+    SendMessage()(
+        account_id=twilio_account_id,
+        auth_token=twilio_auth_token,
+        twilio_number=twilio_number,
+        phone_number=phone_number,
+        payments=payment_list,
+        current_total=current_total,
+        last_month_total=last_month_total,
+    )
 
 flow.storage = Docker(
     base_image="python:3.7",
@@ -352,5 +346,5 @@ flow.storage = Docker(
     image_tag="loan-payoff-reminder",
 )
 
-# flow.register(project_name="Finances")
-flow.run()
+flow.register(project_name="Finances")
+# flow.run()
