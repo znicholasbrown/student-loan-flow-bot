@@ -1,5 +1,5 @@
 # General
-from datetime import timedelta, timezone, datetime
+from datetime import timedelta, timezone, datetime, time
 from operator import itemgetter
 from numbers import Number
 import pprint
@@ -8,7 +8,9 @@ import pprint
 import prefect
 from prefect import Flow, Task, Parameter
 from prefect.client.secrets import Secret
-from prefect.schedules import IntervalSchedule
+from prefect.schedules import Schedule
+from prefect.schedules.clocks import IntervalClock
+from prefect.schedules.filters import between_times
 from prefect.environments.storage import Docker
 
 # Google
@@ -243,8 +245,11 @@ class LogResult(Task):
         return self.logger.info(pprint.pprint(res))
 
 
-# schedule = IntervalSchedule(interval=timedelta(minutes=30))
-with Flow(name="Loan Payoff Reminder") as flow:
+schedule = Schedule(
+    clocks=[IntervalClock(interval=timedelta(weeks=1), start_date=datetime.utcnow())],
+    filters=[between_times(time(10), time(23))],
+)
+with Flow(name="Loan Payoff Reminder", schedule=schedule) as flow:
     budget = Parameter("budget", default=3000)
     phone_number = Parameter("phone_number", default="+15707306535")
 
@@ -318,15 +323,15 @@ with Flow(name="Loan Payoff Reminder") as flow:
         total=current_total,
     )
 
-    SendMessage()(
-        account_id=twilio_account_id,
-        auth_token=twilio_auth_token,
-        twilio_number=twilio_number,
-        phone_number=phone_number,
-        payments=payment_list,
-        current_total=current_total,
-        last_month_total=last_month_total,
-    )
+    # SendMessage()(
+    #     account_id=twilio_account_id,
+    #     auth_token=twilio_auth_token,
+    #     twilio_number=twilio_number,
+    #     phone_number=phone_number,
+    #     payments=payment_list,
+    #     current_total=current_total,
+    #     last_month_total=last_month_total,
+    # )
 
     # LogResult()(get_sheet)
     # LogResult()(row_dict)
@@ -347,5 +352,5 @@ flow.storage = Docker(
     image_tag="loan-payoff-reminder",
 )
 
-flow.register(project_name="Finances")
-# flow.run()
+# flow.register(project_name="Finances")
+flow.run()
