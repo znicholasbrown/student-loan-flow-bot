@@ -246,7 +246,8 @@ class LogResult(Task):
 
 
 schedule = Schedule(
-    clocks=[IntervalClock(interval=timedelta(weeks=1), start_date=datetime.utcnow())]
+    clocks=[IntervalClock(interval=timedelta(weeks=1), start_date=datetime.utcnow())],
+    filters=[between_times(time(hour=10), time(hour=23))],
 )
 with Flow(name="Loan Payoff Reminder", schedule=schedule) as flow:
     budget = Parameter("budget", default=3000)
@@ -344,7 +345,6 @@ flow.storage = Docker(
     image_name="loan-payoff-reminder",
     image_tag="loan-payoff-reminder",
 )
-
 
 flow.register(project_name="Finances")
 # flow.run()
